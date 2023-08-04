@@ -106,38 +106,149 @@ def handle_post_request():
     if d.get("closeall") is True:
         kite = KiteApp(enctoken=d.get("enctoken"))
         position = kite.positions()
-        for item in position['day']:
-            if item['exchange'] == 'NFO':
-                if item['quantity'] > 0:
-                    print(f"Placing sell order for {item['tradingsymbol']} with quantity {item['quantity']}")
-                    telegrammessage(f"Placing sell order for {item['tradingsymbol']} with quantity {item['quantity']}")
+        try:
 
-                    order = kite.place_order(variety=kite.VARIETY_REGULAR,
-                                             exchange=item['exchange'],
-                                             tradingsymbol=item['tradingsymbol'],
-                                             transaction_type=kite.TRANSACTION_TYPE_SELL,
-                                             quantity=item['quantity'],
-                                             product=item['product'],
-                                             order_type=kite.ORDER_TYPE_MARKET,
-                                             price=None,
-                                             validity=None,
-                                             disclosed_quantity=None,
-                                             trigger_price=None,
-                                             squareoff=None,
-                                             stoploss=None,
-                                             trailing_stoploss=None,
-                                             tag="pinepro")
+            for item in position['day']:
+                if item['exchange'] == 'NSE':
+                    if item['quantity'] > 0:
+                        print(f"Placing sell order for {item['tradingsymbol']} with quantity {item['quantity']}")
+                        telegrammessage(f"Placing sell order for {item['tradingsymbol']} with quantity {item['quantity']}")
 
-                    print(f'{order} at [{datetime.now()}]')
-                    telegrammessage(f'Placed {order} at [{datetime.now()}]')
+                        try:
+                            order = kite.place_order(variety=kite.VARIETY_REGULAR,
+                                                 exchange=item['exchange'],
+                                                 tradingsymbol=item['tradingsymbol'],
+                                                 transaction_type=kite.TRANSACTION_TYPE_SELL,
+                                                 quantity=item['quantity'],
+                                                 product=item['product'],
+                                                 order_type=kite.ORDER_TYPE_MARKET,
+                                                 price=None,
+                                                 validity=None,
+                                                 disclosed_quantity=None,
+                                                 trigger_price=None,
+                                                 squareoff=None,
+                                                 stoploss=None,
+                                                 trailing_stoploss=None,
+                                                 tag="pinepro")
 
-                    # Replace with your function call to place a sell order
-                elif item['quantity'] < 0:
-                    print(f"Placing buy order for {item['tradingsymbol']} with quantity {abs(item['quantity'])}")
-                    # Replace with your function call to place a buy order
-                else:
-                    print(f"No action for {item['tradingsymbol']} as quantity is 0")
+                            print(f'{order} at [{datetime.now()}]')
+                            telegrammessage(f'Placed {order} at [{datetime.now()}]')
+                        except Exception as e:
+                            print(f"Erro:{e}")
+                            telegrammessage(f'send valid messaage or order failed')  # todo send valid error to telegram
 
+                        # Replace with your function call to place a sell order
+                    elif item['quantity'] < 0:
+                        print(f"Placing buy order for {item['tradingsymbol']} with quantity {abs(item['quantity'])}")
+                        # Replace with your function call to place a buy order
+                        telegrammessage(f"Placing buy order for {item['tradingsymbol']} with quantity {item['quantity']}")
+
+                        try:
+
+                            order = kite.place_order(variety=kite.VARIETY_REGULAR,
+                                                     exchange=item['exchange'],
+                                                     tradingsymbol=item['tradingsymbol'],
+                                                     transaction_type=kite.TRANSACTION_TYPE_BUY,
+                                                     quantity=abs(item['quantity']),
+                                                     product=item['product'],
+                                                     order_type=kite.ORDER_TYPE_MARKET,
+                                                     price=None,
+                                                     validity=None,
+                                                     disclosed_quantity=None,
+                                                     trigger_price=None,
+                                                     squareoff=None,
+                                                     stoploss=None,
+                                                     trailing_stoploss=None,
+                                                     tag="pinepro")
+
+                            print(f'{order} at [{datetime.now()}]')
+                            telegrammessage(f'Placed {order} at [{datetime.now()}]')
+                        except Exception as e:
+                            print(f"Erro:{e}")
+                            telegrammessage(f'send valid messaage or order failed')  # todo send valid error to telegram
+
+                    else:
+                        print(f"No action for {item['tradingsymbol']} as quantity is 0")
+        except Exception as e:
+            print(f"Erro:{e}")
+            telegrammessage(f'send valid messaage or order failed') #todo send valid error to telegram
+
+    if d.get("closethissymbol") is True:
+        tradingsymbol_to_close = d.get("tradingsymbol")
+        kite = KiteApp(enctoken=d.get("enctoken"))
+        position = kite.positions()
+        try:
+
+            for item in position['day']:
+                if item['exchange'] == 'NSE' and item['tradingsymbol'] == tradingsymbol_to_close:
+                    if item['quantity'] > 0:
+                        print(f"Placing sell order for {item['tradingsymbol']} with quantity {item['quantity']}")
+                        telegrammessage(f"Placing sell order for {item['tradingsymbol']} with quantity {item['quantity']}")
+                        # Place sell order code
+                        try:
+
+                            order = kite.place_order(variety=kite.VARIETY_REGULAR,
+                                                     exchange=item['exchange'],
+                                                     tradingsymbol=item['tradingsymbol'],
+                                                     transaction_type=kite.TRANSACTION_TYPE_SELL,
+                                                     quantity=item['quantity'],
+                                                     product=item['product'],
+                                                     order_type=kite.ORDER_TYPE_MARKET,
+                                                     price=None,
+                                                     validity=None,
+                                                     disclosed_quantity=None,
+                                                     trigger_price=None,
+                                                     squareoff=None,
+                                                     stoploss=None,
+                                                     trailing_stoploss=None,
+                                                     tag="pinepro")
+
+                            print(f'{order} at [{datetime.now()}]')
+                            telegrammessage(f'Placed {order} at [{datetime.now()}]')
+                        except Exception as e:
+                            print(f"Erro:{e}")
+                            telegrammessage(f'send valid messaage or order failed')  # todo send valid error to telegram
+
+                        # ...
+                    elif item['quantity'] < 0:
+                        print(f"Placing buy order for {item['tradingsymbol']} with quantity {abs(item['quantity'])}")
+                        telegrammessage(
+                            f"Placing buy order for {item['tradingsymbol']} with quantity {abs(item['quantity'])}")
+                        # Place buy order code
+                        try:
+
+                            order = kite.place_order(variety=kite.VARIETY_REGULAR,
+                                                     exchange=item['exchange'],
+                                                     tradingsymbol=item['tradingsymbol'],
+                                                     transaction_type=kite.TRANSACTION_TYPE_BUY,
+                                                     quantity=abs(item['quantity']),
+                                                     product=item['product'],
+                                                     order_type=kite.ORDER_TYPE_MARKET,
+                                                     price=None,
+                                                     validity=None,
+                                                     disclosed_quantity=None,
+                                                     trigger_price=None,
+                                                     squareoff=None,
+                                                     stoploss=None,
+                                                     trailing_stoploss=None,
+                                                     tag="pinepro")
+
+                            print(f'{order} at [{datetime.now()}]')
+                            telegrammessage(f'Placed {order} at [{datetime.now()}]')
+                        except Exception as e:
+                            print(f"Erro:{e}")
+                            telegrammessage(f'send valid messaage or order failed')  # todo send valid error to telegram
+
+                        # ...
+                    else:
+                        print(f"No action for {item['tradingsymbol']} as quantity is 0")
+        except Exception as e:
+            print(f"Erro:{e}")
+            telegrammessage(f'send valid messaage or order failed') #todo send valid error to telegram
+
+    else:
+        # Handle other scenarios, if necessary
+        pass
 
     return '200'
 
